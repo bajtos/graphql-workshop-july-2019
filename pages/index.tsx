@@ -6,14 +6,15 @@ import Layout from '../components/Layout';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
+import PollList from '../components/PollList';
+
 const QUERY_ALL_POLLS = gql`
   query GetAllPolls {
     polls {
-      id
-      question
-      voteCount
+      ...PollListFragment
     }
   }
+  ${PollList.fragments.polls}
 `;
 
 export default function Index() {
@@ -28,26 +29,9 @@ export default function Index() {
           if (error) {
             return error.toString();
           }
-          return (
-            <ul>
-              {data.polls.map(p => (
-                <PollOverview poll={p} />
-              ))}
-            </ul>
-          );
+          return <PollList polls={data.polls} />;
         }}
       </Query>
     </Layout>
-  );
-}
-
-function PollOverview({ poll }) {
-  return (
-    <li>
-      <Link href={`detail?id=${poll.id}`} as={`/detail/${poll.id}`}>
-        <a>{poll.question}</a>
-      </Link>{' '}
-      ({poll.voteCount} <Icon type="like" />)
-    </li>
   );
 }
