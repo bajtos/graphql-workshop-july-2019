@@ -9,6 +9,13 @@ import { ApolloProvider } from 'react-apollo';
 
 import fetch from 'isomorphic-fetch';
 
+const myFetch = (url, opts) => {
+  return fetch(url, {
+    ...opts,
+    headers: { ...opts.headers, jwt: '1140553' }
+  });
+};
+
 const client = new ApolloClient({
   // By default, this client will send queries to the
   //  `/graphql` endpoint on the same host
@@ -16,7 +23,7 @@ const client = new ApolloClient({
   // to a different host
   link: new HttpLink({
     uri: 'http://graphql-workshop-2019.herokuapp.com/graphql',
-    fetch
+    fetch: myFetch
   }),
   cache: new InMemoryCache()
 });
