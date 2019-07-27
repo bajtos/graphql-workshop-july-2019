@@ -24,6 +24,10 @@ const VOTE_POLL_MUTATION = gql`
     votePoll(pollId: $pollId, answerId: $answerId) {
       id
       voteCount
+      answers {
+        id
+        voteCount
+      }
     }
   }
 `;
