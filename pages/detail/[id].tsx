@@ -4,7 +4,7 @@ import { Icon, Progress } from 'antd';
 import Layout from '../../components/Layout';
 import gql from 'graphql-tag';
 import { useRouter } from 'next/router';
-import { Query } from 'react-apollo';
+import { Query, Mutation } from 'react-apollo';
 
 const GET_POLL_QUERY = gql`
   query GetPollDetail($id: String!) {
@@ -19,6 +19,15 @@ const GET_POLL_QUERY = gql`
   }
 `;
 
+const VOTE_POLL_MUTATION = gql`
+  mutation VotePoll($pollId: String!, $answerId: String!) {
+    votePoll(pollId: $pollId, answerId: $answerId) {
+      id
+      voteCount
+    }
+  }
+`;
+
 export default function Detail() {
   const router = useRouter();
   const { id } = router.query;
@@ -26,12 +35,8 @@ export default function Detail() {
     <Layout>
       <Query query={GET_POLL_QUERY} variables={{ id }}>
         {({ data, error, loading }) => {
-          if (loading) {
-            return <Icon type="loading" />;
-          }
-          if (error) {
-            return error.toString();
-          }
+          if (loading) return <Icon type="loading" />;
+          if (error) return error.toString();
 
           const totalVotes = data.poll.answers.reduce((acc, c) => acc + c, 0);
 
@@ -41,7 +46,12 @@ export default function Detail() {
               <ol>
                 {data.poll.answers.map(a => {
                   return (
-                    <Answer key={a.id} answer={a} totalVotes={totalVotes} />
+                    <Answer
+                      key={a.id}
+                      pollId={id}
+                      answer={a}
+                      totalVotes={totalVotes}
+                    />
                   );
                 })}
               </ol>
@@ -53,19 +63,31 @@ export default function Detail() {
   );
 }
 
-function Answer({ answer, totalVotes }) {
+function Answer({ answer, totalVotes, pollId }) {
   return (
-    <li>
-      <a href="#">{answer.text}</a>
-
-      <Progress
-        percent={(100 / totalVotes) * answer.voteCount}
-        format={number => (
-          <div style={{ float: 'right' }}>
-            {answer.voteCount} <Icon type="like" />
-          </div>
-        )}
-      />
-    </li>
+    <Mutation mutation={VOTE_POLL_MUTATION}>
+      {(vote, { loading, error }) => (
+        <li>
+          <a
+            href="#"
+            onClick={e => {
+              e.preventDefault();
+              vote({ variables: { pollId, answerId: answer.id } });
+            }}
+          >
+            {answer.text}
+          </a>
+          {loading && <Icon type="loading" />}
+          <Progress
+            percent={(100 / totalVotes) * answer.voteCount}
+            format={number => (
+              <div style={{ float: 'right' }}>
+                {answer.voteCount} <Icon type="like" />
+              </div>
+            )}
+          />
+        </li>
+      )}
+    </Mutation>
   );
 }
