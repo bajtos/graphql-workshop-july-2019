@@ -7,6 +7,7 @@ import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
 import PollList from '../components/PollList';
+import { GetAllPolls } from '../__generated__/GetAllPolls';
 
 const QUERY_ALL_POLLS = gql`
   query GetAllPolls {
@@ -21,7 +22,7 @@ export default function Index() {
   return (
     <Layout>
       <h2>Latest Questions</h2>
-      <Query query={QUERY_ALL_POLLS}>
+      <Query<GetAllPolls> query={QUERY_ALL_POLLS}>
         {({ data, error, loading }) => {
           if (loading) {
             return <Icon type="loading" />;
@@ -29,7 +30,7 @@ export default function Index() {
           if (error) {
             return error.toString();
           }
-          return <PollList polls={data.polls} />;
+          return <PollList {...data} />;
         }}
       </Query>
     </Layout>

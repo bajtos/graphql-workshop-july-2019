@@ -2,8 +2,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Icon } from 'antd';
 import gql from 'graphql-tag';
+import {
+  GetAllPolls_polls,
+  GetAllPolls
+} from '../../__generated__/GetAllPolls';
 
-export default function PollList({ polls }) {
+export default function PollList({ polls }: GetAllPolls) {
   return (
     <ul>
       {polls.map(p => (
@@ -13,7 +17,7 @@ export default function PollList({ polls }) {
   );
 }
 
-function PollOverview({ poll }) {
+function PollOverview({ poll }: { poll: GetAllPolls_polls }) {
   return (
     <li>
       <Link href={`detail?id=${poll.id}`} as={`/detail/${poll.id}`}>

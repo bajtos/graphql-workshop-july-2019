@@ -5,6 +5,8 @@ import Layout from '../../components/Layout';
 import gql from 'graphql-tag';
 import { useRouter } from 'next/router';
 import { Query, Mutation } from 'react-apollo';
+import { GetPollDetail } from '../../__generated__/GetPollDetail';
+import { VotePollVariables, VotePoll } from '../../__generated__/VotePoll';
 
 const GET_POLL_QUERY = gql`
   query GetPollDetail($id: String!) {
@@ -37,12 +39,15 @@ export default function Detail() {
   const { id } = router.query;
   return (
     <Layout>
-      <Query query={GET_POLL_QUERY} variables={{ id }}>
+      <Query<GetPollDetail> query={GET_POLL_QUERY} variables={{ id }}>
         {({ data, error, loading }) => {
           if (loading) return <Icon type="loading" />;
           if (error) return error.toString();
 
-          const totalVotes = data.poll.answers.reduce((acc, c) => acc + c, 0);
+          const totalVotes = data.poll.answers.reduce(
+            (acc, c) => acc + c.voteCount,
+            0
+          );
 
           return (
             <>
@@ -69,7 +74,7 @@ export default function Detail() {
 
 function Answer({ answer, totalVotes, pollId }) {
   return (
-    <Mutation mutation={VOTE_POLL_MUTATION}>
+    <Mutation<VotePoll, VotePollVariables> mutation={VOTE_POLL_MUTATION}>
       {(vote, { loading, error }) => (
         <li>
           <a
