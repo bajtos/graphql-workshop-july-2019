@@ -13,9 +13,7 @@ const GET_POLL_QUERY = gql`
       answers {
         id
         text
-        users {
-          username
-        }
+        voteCount
       }
     }
   }
@@ -42,16 +40,8 @@ export default function Detail() {
               <h2>{data.poll.question}</h2>
               <ol>
                 {data.poll.answers.map(a => {
-                  const { id, text } = a;
-                  const votes = a.users.length;
-
                   return (
-                    <Answer
-                      key={id}
-                      text={text}
-                      votes={votes}
-                      totalVotes={totalVotes}
-                    />
+                    <Answer key={a.id} answer={a} totalVotes={totalVotes} />
                   );
                 })}
               </ol>
@@ -63,16 +53,16 @@ export default function Detail() {
   );
 }
 
-function Answer({ text, votes, totalVotes }) {
+function Answer({ answer, totalVotes }) {
   return (
     <li>
-      <a href="#">{text}</a>
+      <a href="#">{answer.text}</a>
 
       <Progress
-        percent={(100 / totalVotes) * votes}
+        percent={(100 / totalVotes) * answer.voteCount}
         format={number => (
           <div style={{ float: 'right' }}>
-            {votes} <Icon type="like" />
+            {answer.voteCount} <Icon type="like" />
           </div>
         )}
       />
