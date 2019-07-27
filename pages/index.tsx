@@ -28,20 +28,26 @@ export default function Index() {
           if (error) {
             return error.toString();
           }
-          return data.polls.map(p => {
-            return (
-              <ul>
-                <li>
-                  <Link href={`detail?id=${p.id}`}>
-                    <a>{p.question}</a>
-                  </Link>{' '}
-                  ({p.voteCount} <Icon type="like" />)
-                </li>
-              </ul>
-            );
-          });
+          return (
+            <ul>
+              {data.polls.map(p => (
+                <PollOverview poll={p} />
+              ))}
+            </ul>
+          );
         }}
       </Query>
     </Layout>
+  );
+}
+
+function PollOverview({ poll }) {
+  return (
+    <li>
+      <Link href={`detail?id=${poll.id}`} as={`/detail/${poll.id}`}>
+        <a>{poll.question}</a>
+      </Link>{' '}
+      ({poll.voteCount} <Icon type="like" />)
+    </li>
   );
 }
